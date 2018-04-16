@@ -1,0 +1,23 @@
+{
+  "name": "ui-3dsurfaces",
+  "version": "1.0.0",
+  "description": "3D Surfaces Viewer",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "lite-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brain-life/ui-3dsurfaces.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brain-life/ui-3dsurfaces/issues"
+  },
+  "homepage": "https://github.com/brain-life/ui-3dsurfaces#readme",
+  "dependencies": {
+    "panning-orbit-controls": "^1.0.0",
+    "three": "^0.91.0"
+  }
+}
