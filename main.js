@@ -1,4 +1,6 @@
 var config = window.config || window.parent.config || {
+
+    //test data in case window.config isn't set (probably development?)
     surfaces: [
         {name: "Callosum Forceps Major", path:"testdata/surfaces/Callosum_Forceps_Major_surf.vtk"},
         {name: "Callosumx Forceps Minor", path:"testdata/surfaces/Callosum_Forceps_Minor_surf.vtk"},
@@ -18,18 +20,59 @@ var config = window.config || window.parent.config || {
         {name: "Right ILF", path: "testdata/surfaces/Right_ILF_surf.vtk" },
         {name: "Right SLF", path: "testdata/surfaces/Right_SLF_surf.vtk" },
         {name: "Right Thalamic Radiation", path: "testdata/surfaces/Right_Thalamic_Radiation_surf.vtk" },
-        {nane: "Right Uncinate", path: "testdata/surfaces/Right_Uncinate_surf.vtk" },
+        {name: "Right Uncinate", path: "testdata/surfaces/Right_Uncinate_surf.vtk" },
     ]
 }
 
+Vue.component("controller", {
+    props: [ "meshes" ],
+    data: function() {
+        return {
+            rotate: true,
+            all: true,
+        }
+    },
+    methods: {
+    },
+    watch: {
+        all: function() {
+            this.meshes.forEach(_m=>{
+                _m.mesh.visible = this.all;
+            });
+        },
+        rotate: function() {
+            this.$emit('rotate');
+        },
+    },
+    template: `
+        <div>
+            <div class="control">
+                <input type="checkbox" v-model="rotate"></input> Rotate</input>
+            </div>
+            <hr>
+            <h3>Surfaces</h3>
+            <div class="control">
+                <input type="checkbox" v-model="all"></input> (All)</input>
+            </div>
+            <div class="control" v-for="_m in meshes">
+                <input type="checkbox" v-model="_m.mesh.visible"></input> {{_m.name}}
+            </div>
+        </div>
+    `,
+});
+
+/*
 Vue.component("soichi", {
     data: function() {
         return {
             name: "soichi",
         }
     },
-    template: '<b>{{name}}</b>',
+    template: `
+        <b>{{name}}</b>
+    `,
 });
+*/
 
 function hashstring(s) {
     var h = 0, l = s.length, i = 0;
@@ -43,21 +86,24 @@ new Vue({
     el: "#app",
     template: `
         <div style="height: 100%; position: relative;">
-            <h1 style="position: absolute;">Surfaces</h1>
+            <controller v-if="controls" :meshes="meshes" @rotate="toggle_rotate()" id="controller"/>
             <div ref="main" class="main"></div>
         </div>
     `,
-    components: [ "soichi" ],
+    components: [ "controller" ],
     data() {
         return {
             //var views = document.getElementById("views");
-            surfaces: [], //surface scenes
+            //surfaces: [], //surface scenes
 
             //main components
             scene: null, 
             camera: null,
             renderer: null,
             controls: null,
+
+            //loaded meshes
+            meshes: [],
         }
     },
     mounted: function() {
@@ -68,7 +114,9 @@ new Vue({
 
         //init..
         this.scene = new THREE.Scene();
-        //scene.background = new THREE.Color(0x0000ff);
+        //this.scene.background = new THREE.Color(0x0000ff);
+        //this.scene.fog = new THREE.Fog( 0x000000, 250, 1000 );
+
         this.camera = new THREE.PerspectiveCamera( 45, this.$refs.main.clientWidth / this.$refs.main.clientHeight, 1, 5000);
         this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
         this.renderer.setSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
@@ -77,17 +125,18 @@ new Vue({
         //camera
         this.camera.position.z = 200;
         this.scene.add(this.camera);
-        
-        /*
-        //light (why adding to camera?)
-        var amblight = new THREE.AmbientLight(0x101010);
-        this.camera.add(amblight);
-        */
 
-        var dirLight = new THREE.DirectionalLight(0xffffff);
-        dirLight.position.set(200, 200, 1000).normalize();
-        this.camera.add(dirLight);
-        this.camera.add(dirLight.target);
+        //light
+        var amblight = new THREE.AmbientLight(0xffffff, 0.3);
+        this.scene.add(amblight);
+
+        var dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dirLight.position.set(2000, 2000, 5000).normalize();
+        this.scene.add(dirLight);
+
+        var pointLight = new THREE.PointLight(0xffffff, 0.7);
+        pointLight.position.set(-2000, 2000, -5000);
+        this.scene.add(pointLight);
         
         //controls
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
@@ -111,17 +160,19 @@ new Vue({
 
         this.animate();
         
+        /*
         //test
         var geometry = new THREE.BoxGeometry( 50, 50, 25 );
         var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
         var cube = new THREE.Mesh( geometry, material );
         this.scene.add( cube );
+        */
         
         //start loading surfaces geometries
         var loader = new THREE.VTKLoader();
         config.surfaces.forEach(surface=>{
             loader.load(surface.path, geometry=>{
-                this.create_scene(surface.name, geometry);
+                this.add_surface(surface.name, geometry);
             });
         });
     },
@@ -132,26 +183,35 @@ new Vue({
             this.renderer.render(this.scene, this.camera);
         },
 
-        create_scene: function(view_name, geometry) {
-            console.log(view_name, geometry);
+        add_surface: function(name, geometry) {
+            console.log(name, geometry);
 
-            var scene = new THREE.Scene();
-            this.scene.add(this.camera);
+            //var scene = new THREE.Scene();
+            //this.scene.add(this.camera);
             
             geometry.computeVertexNormals();
             //geometry.center();
-            //var hash = hashstring(view_name);
+            hname = name.replace("Left", "");
+            hname = hname.replace("Right", "");
+            var hash = hashstring(hname);
             //var material = new THREE.MeshLambertMaterial({color: new THREE.Color(hash)}); 
-            var material = new THREE.MeshLambertMaterial({color: new THREE.Color(0x6666ff)}); 
+            //var material = new THREE.MeshLambertMaterial({color: new THREE.Color(0x6666ff)}); 
+            //var material = new THREE.MeshBasicMaterial({color: new THREE.Color(hash)});
+            var material = new THREE.MeshPhongMaterial({color: new THREE.Color(hash)});
             var mesh = new THREE.Mesh(geometry, material);
             mesh.rotation.x += Math.PI / 2;
             mesh.position.x -= 100; //rigith/left
             mesh.position.y += 100; //s/i
             mesh.position.z -= 100; //a/p
+            this.meshes.push({name, mesh});
             
-            scene.add(mesh);
-            this.surfaces.push(scene);
-        }
+            //scene.add(mesh);
+            this.scene.add(mesh);
+        },
+
+        toggle_rotate: function() {
+            this.controls.autoRotate = !this.controls.autoRotate;
+        },
     },
 });
 
