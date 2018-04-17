@@ -88,7 +88,7 @@ new Vue({
     template: `
         <div style="height: 100%; position: relative;">
             <controller v-if="controls" :meshes="meshes" @rotate="toggle_rotate()" id="controller"/>
-            <h2 id="loading" v-if="loading">Loading ...</h2>
+            <h2 id="loading" v-if="toload > 0">Loading <small>({{toload}})</small>...</h2>
             <div ref="main" class="main"></div>
         </div>
     `,
@@ -97,7 +97,7 @@ new Vue({
         return {
             //var views = document.getElementById("views");
             //surfaces: [], //surface scenes
-            loading: true,
+            toload: 0,
 
             //main components
             scene: null, 
@@ -162,11 +162,10 @@ new Vue({
         */
         
         //start loading surfaces geometries
-        var toload = config.surfaces.length;
+        this.toload = config.surfaces.length;
         config.surfaces.forEach(surface=>{
             loader.load(surface.path, geometry=>{
-                toload--;
-                if(toload == 0) this.loading = false;
+                this.toload--;
                 this.add_surface(surface.name, geometry);
             });
         });
@@ -192,9 +191,9 @@ new Vue({
             
             geometry.computeVertexNormals();
             //geometry.center();
+            name = name.replace("_", " ");
             hname = name.replace("Left", "");
             hname = hname.replace("Right", "");
-            hname = hname.replace("_", " ");
             var hash = hashstring(hname);
             //var material = new THREE.MeshLambertMaterial({color: new THREE.Color(hash)}); 
             //var material = new THREE.MeshLambertMaterial({color: new THREE.Color(0x6666ff)}); 
