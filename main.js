@@ -81,6 +81,7 @@ function hashstring(s) {
             h = (h << 5) - h + s.charCodeAt(i++) | 0;
     return h;
 }
+var loader = new THREE.VTKLoader();
 
 new Vue({
     el: "#app",
@@ -112,7 +113,6 @@ new Vue({
         //TODO update to make it look like
         //view-source:https://threejs.org/examples/webgl_multiple_elements.html
 
-        console.log("loading surfaces");
 
         //init..
         this.scene = new THREE.Scene();
@@ -162,7 +162,6 @@ new Vue({
         */
         
         //start loading surfaces geometries
-        var loader = new THREE.VTKLoader();
         config.surfaces.forEach(surface=>{
             loader.load(surface.path, geometry=>{
                 this.add_surface(surface.name, geometry);
@@ -174,7 +173,6 @@ new Vue({
             this.camera.aspect = this.$refs.main.clientWidth / this.$refs.main.clientHeight;
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
-            console.log(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
             //this.controls.handleResize();
         },
         animate: function() {
