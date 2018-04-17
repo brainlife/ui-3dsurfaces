@@ -9,8 +9,8 @@
             font-family: 'Open Sans';
             margin: 0px;
             padding: 0px;
-            overflow: hidden;
             height: 100%;
+            overflow: hidden;
         }
         #app {
             padding: 0px;
@@ -27,8 +27,11 @@
             position: absolute;
             color: white;
             background-color: rgba(0,0,0,0.5);
-            padding: 4px;
             right: 0px;
+            max-height: 100%;
+            overflow: auto;
+            padding: 5px;
+            box-sizing: border-box;
         }
         #controller h3 {
             color: gray;
@@ -36,6 +39,12 @@
             margin: 0px;
             margin-bottom: 5px;
             text-transform: uppercase;
+        }
+        #loading {
+            position: absolute;
+            bottom: 0px;
+            color: gray;
+            margin: 10px;
         }
         </style>
     </head>

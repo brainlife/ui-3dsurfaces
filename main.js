@@ -28,7 +28,7 @@ Vue.component("controller", {
     props: [ "meshes" ],
     data: function() {
         return {
-            rotate: true,
+            rotate: false,
             all: true,
         }
     },
@@ -87,6 +87,7 @@ new Vue({
     template: `
         <div style="height: 100%; position: relative;">
             <controller v-if="controls" :meshes="meshes" @rotate="toggle_rotate()" id="controller"/>
+            <h2 id="loading" v-if="loading">Loading ...</h2>
             <div ref="main" class="main"></div>
         </div>
     `,
@@ -95,6 +96,7 @@ new Vue({
         return {
             //var views = document.getElementById("views");
             //surfaces: [], //surface scenes
+            loading: true,
 
             //main components
             scene: null, 
@@ -114,15 +116,15 @@ new Vue({
 
         //init..
         this.scene = new THREE.Scene();
-        //this.scene.background = new THREE.Color(0x0000ff);
+        this.scene.background = new THREE.Color(0x333333);
         //this.scene.fog = new THREE.Fog( 0x000000, 250, 1000 );
 
+        //camera/renderer
         this.camera = new THREE.PerspectiveCamera( 45, this.$refs.main.clientWidth / this.$refs.main.clientHeight, 1, 5000);
-        this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
-        this.renderer.setSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
+        //this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+        this.renderer = new THREE.WebGLRenderer();
+        //this.renderer.setSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
         this.$refs.main.append(this.renderer.domElement);
-       
-        //camera
         this.camera.position.z = 200;
         this.scene.add(this.camera);
 
@@ -140,24 +142,15 @@ new Vue({
         
         //controls
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.autoRotate = true;
+        /*
         this.controls.addEventListener('change', function(e) {
-            //rotation changes
         });
         this.controls.addEventListener('start', function(){
-            //use interacting with control
-            //gamma_input_el.trigger({type: "blur"});
-            //controls.autoRotate = false;
         });
+        */
 
-        //event handlers
-        window.addEventListener("resize", ()=>{
-            this.camera.aspect = this.$refs.main.clientWidth / this.$refs.main.clientHeight;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
-            this.controls.handleResize();
-        });
-
+        window.addEventListener("resize", this.resize);
+        this.resize();
         this.animate();
         
         /*
@@ -177,6 +170,13 @@ new Vue({
         });
     },
     methods: {
+        resize: function() {
+            this.camera.aspect = this.$refs.main.clientWidth / this.$refs.main.clientHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
+            console.log(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
+            //this.controls.handleResize();
+        },
         animate: function() {
             requestAnimationFrame(this.animate);
             this.controls.update();
@@ -193,6 +193,7 @@ new Vue({
             //geometry.center();
             hname = name.replace("Left", "");
             hname = hname.replace("Right", "");
+            hname = hname.replace("_", " ");
             var hash = hashstring(hname);
             //var material = new THREE.MeshLambertMaterial({color: new THREE.Color(hash)}); 
             //var material = new THREE.MeshLambertMaterial({color: new THREE.Color(0x6666ff)}); 
@@ -200,6 +201,7 @@ new Vue({
             var material = new THREE.MeshPhongMaterial({color: new THREE.Color(hash)});
             var mesh = new THREE.Mesh(geometry, material);
             mesh.rotation.x += Math.PI / 2;
+
             mesh.position.x -= 100; //rigith/left
             mesh.position.y += 100; //s/i
             mesh.position.z -= 100; //a/p
@@ -207,6 +209,8 @@ new Vue({
             
             //scene.add(mesh);
             this.scene.add(mesh);
+
+            if(this.meshes.length == config.surfaces.length) this.loading = false;
         },
 
         toggle_rotate: function() {
