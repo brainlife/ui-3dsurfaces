@@ -3,7 +3,7 @@ var config = window.config || window.parent.config || {
     //test data in case window.config isn't set (probably development?)
     surfaces: [
         {name: "Callosum Forceps Major", path:"testdata/surfaces/Callosum_Forceps_Major_surf.vtk"},
-        {name: "Callosumx Forceps Minor", path:"testdata/surfaces/Callosum_Forceps_Minor_surf.vtk"},
+        {name: "Callosum Forceps Minor", path:"testdata/surfaces/Callosum_Forceps_Minor_surf.vtk"},
         {name: "Left Arcuate", path:"testdata/surfaces/Left_Arcuate_surf.vtk"},
         {name: "Left Cingulum Cingulate", path:"testdata/surfaces/Left_Cingulum_Cingulate_surf.vtk"},
         {name: "Left Corticospinal", path:"testdata/surfaces/Left_Corticospinal_surf.vtk"},
