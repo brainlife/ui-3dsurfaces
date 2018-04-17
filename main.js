@@ -162,8 +162,11 @@ new Vue({
         */
         
         //start loading surfaces geometries
+        var toload = config.surfaces.length;
         config.surfaces.forEach(surface=>{
             loader.load(surface.path, geometry=>{
+                toload--;
+                if(toload == 0) this.loading = false;
                 this.add_surface(surface.name, geometry);
             });
         });
@@ -208,7 +211,6 @@ new Vue({
             //scene.add(mesh);
             this.scene.add(mesh);
 
-            if(this.meshes.length == config.surfaces.length) this.loading = false;
         },
 
         toggle_rotate: function() {
