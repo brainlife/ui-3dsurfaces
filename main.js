@@ -200,8 +200,6 @@ new Vue({
         animate: function() {
             requestAnimationFrame(this.animate);
             this.controls.update();
-
-            console.log(this.para3d);
             if(this.para3d) {
                 this.effect.render(this.scene, this.camera);
             } else {
