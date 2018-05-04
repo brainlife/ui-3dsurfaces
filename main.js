@@ -29,6 +29,7 @@ Vue.component("controller", {
     data: function() {
         return {
             rotate: false,
+            para3d: false,
             all: true,
         }
     },
@@ -43,11 +44,15 @@ Vue.component("controller", {
         rotate: function() {
             this.$emit('rotate');
         },
+        para3d: function() {
+            this.$emit('para3d', this.para3d);
+        },
     },
     template: `
         <div>
             <div class="control">
                 <input type="checkbox" v-model="rotate"></input> Rotate</input>
+                <input type="checkbox" v-model="para3d"></input> 3D</input>
             </div>
             <hr>
             <h3>Surfaces</h3>
@@ -87,7 +92,7 @@ new Vue({
     el: "#app",
     template: `
         <div style="height: 100%; position: relative;">
-            <controller v-if="controls" :meshes="meshes" @rotate="toggle_rotate()" id="controller"/>
+            <controller v-if="controls" :meshes="meshes" @rotate="toggle_rotate()" id="controller" @para3d="set_para3d"/>
             <h2 id="loading" v-if="toload > 0">Loading <small>({{toload}})</small>...</h2>
             <div ref="main" class="main"></div>
         </div>
@@ -100,6 +105,7 @@ new Vue({
             toload: 0,
 
             //main components
+            effect: null,
             scene: null, 
             camera: null,
             renderer: null,
@@ -113,6 +119,8 @@ new Vue({
         //TODO update to make it look like
         //view-source:https://threejs.org/examples/webgl_multiple_elements.html
 
+        var width = this.$refs.main.clientWidth;
+        var height = this.$refs.main.clientHeight;
 
         //init..
         this.scene = new THREE.Scene();
@@ -120,10 +128,14 @@ new Vue({
         //this.scene.fog = new THREE.Fog( 0x000000, 250, 1000 );
 
         //camera/renderer
-        this.camera = new THREE.PerspectiveCamera( 45, this.$refs.main.clientWidth / this.$refs.main.clientHeight, 1, 5000);
+        this.camera = new THREE.PerspectiveCamera( 45, width / height, 1, 5000);
         //this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
         this.renderer = new THREE.WebGLRenderer();
-        //this.renderer.setSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
+
+        //https://github.com/mrdoob/three.js/blob/master/examples/webgl_effects_parallaxbarrier.html
+        this.effect = new THREE.ParallaxBarrierEffect( this.renderer );
+        this.effect.setSize( width, height );
+        
         this.$refs.main.append(this.renderer.domElement);
         this.camera.position.z = 200;
         this.scene.add(this.camera);
@@ -172,15 +184,29 @@ new Vue({
     },
     methods: {
         resize: function() {
-            this.camera.aspect = this.$refs.main.clientWidth / this.$refs.main.clientHeight;
+            var width = this.$refs.main.clientWidth;
+            var height = this.$refs.main.clientHeight;
+
+            this.camera.aspect = width / height;
             this.camera.updateProjectionMatrix();
-            this.renderer.setSize(this.$refs.main.clientWidth, this.$refs.main.clientHeight);
-            //this.controls.handleResize();
+            this.renderer.setSize(width, height);
+            this.effect.setSize( width, height );
         },
+
+        set_para3d: function(it) {
+            this.para3d = it;
+        },
+
         animate: function() {
             requestAnimationFrame(this.animate);
             this.controls.update();
-            this.renderer.render(this.scene, this.camera);
+
+            console.log(this.para3d);
+            if(this.para3d) {
+                this.effect.render(this.scene, this.camera);
+            } else {
+                this.renderer.render(this.scene, this.camera);
+            }
         },
 
         add_surface: function(name, geometry) {
