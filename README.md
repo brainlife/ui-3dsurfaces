@@ -4,9 +4,7 @@
 
 This app takes a configured list of URLs for VTK files and renderes it using WebGL. This app is used by Brainlife to show `neuro/3dsurfaces` datasets.
 ![screenshot](screenshot.png)
-
-
-[demo](https://brainlife.io/ui/surfaces/)
+Take a look at this [demo](https://brainlife.io/ui/surfaces/)
 
 ### Authors
 - Soichi Hayashi (hayashis@iu.edu)
