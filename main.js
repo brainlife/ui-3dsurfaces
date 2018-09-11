@@ -36,15 +36,15 @@ Vue.component("controller", {
     methods: {
     },
     watch: {
-        all: function() {
+        all() {
             this.meshes.forEach(_m=>{
                 _m.mesh.visible = this.all;
             });
         },
-        rotate: function() {
+        rotate() {
             this.$emit('rotate');
         },
-        para3d: function() {
+        para3d() {
             this.$emit('para3d', this.para3d);
         },
     },
@@ -65,19 +65,6 @@ Vue.component("controller", {
         </div>
     `,
 });
-
-/*
-Vue.component("soichi", {
-    data: function() {
-        return {
-            name: "soichi",
-        }
-    },
-    template: `
-        <b>{{name}}</b>
-    `,
-});
-*/
 
 function hashstring(s) {
     var h = 0, l = s.length, i = 0;
@@ -100,8 +87,6 @@ new Vue({
     components: [ "controller" ],
     data() {
         return {
-            //var views = document.getElementById("views");
-            //surfaces: [], //surface scenes
             toload: 0,
 
             //main components
@@ -115,21 +100,14 @@ new Vue({
             meshes: [],
         }
     },
-    mounted: function() {
-        //TODO update to make it look like
-        //view-source:https://threejs.org/examples/webgl_multiple_elements.html
-
+    mounted() {
         var width = this.$refs.main.clientWidth;
         var height = this.$refs.main.clientHeight;
 
-        //init..
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x333333);
-        //this.scene.fog = new THREE.Fog( 0x000000, 250, 1000 );
 
-        //camera/renderer
         this.camera = new THREE.PerspectiveCamera( 45, width / height, 1, 5000);
-        //this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
         this.renderer = new THREE.WebGLRenderer();
 
         //https://github.com/mrdoob/three.js/blob/master/examples/webgl_effects_parallaxbarrier.html
@@ -140,38 +118,20 @@ new Vue({
         this.camera.position.z = 200;
         this.scene.add(this.camera);
 
-        //light
         var amblight = new THREE.AmbientLight(0xffffff, 0.3);
         this.scene.add(amblight);
-
         var dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
         dirLight.position.set(2000, 2000, 5000).normalize();
         this.scene.add(dirLight);
-
         var pointLight = new THREE.PointLight(0xffffff, 0.7);
         pointLight.position.set(-2000, 2000, -5000);
         this.scene.add(pointLight);
         
-        //controls
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        /*
-        this.controls.addEventListener('change', function(e) {
-        });
-        this.controls.addEventListener('start', function(){
-        });
-        */
 
         window.addEventListener("resize", this.resize);
         this.resize();
         this.animate();
-        
-        /*
-        //test
-        var geometry = new THREE.BoxGeometry( 50, 50, 25 );
-        var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-        var cube = new THREE.Mesh( geometry, material );
-        this.scene.add( cube );
-        */
         
         //start loading surfaces geometries
         this.toload = config.surfaces.length;
@@ -182,8 +142,9 @@ new Vue({
             });
         });
     },
+
     methods: {
-        resize: function() {
+        resize() {
             var width = this.$refs.main.clientWidth;
             var height = this.$refs.main.clientHeight;
 
@@ -193,11 +154,11 @@ new Vue({
             this.effect.setSize( width, height );
         },
 
-        set_para3d: function(it) {
+        set_para3d(it) {
             this.para3d = it;
         },
 
-        animate: function() {
+        animate() {
             requestAnimationFrame(this.animate);
             this.controls.update();
             if(this.para3d) {
@@ -207,36 +168,23 @@ new Vue({
             }
         },
 
-        add_surface: function(name, geometry) {
-            console.log(name, geometry);
-
-            //var scene = new THREE.Scene();
-            //this.scene.add(this.camera);
-            
+        add_surface(name, geometry) {
             geometry.computeVertexNormals();
-            //geometry.center();
             name = name.replace("_", " ");
             hname = name.replace("Left", "");
             hname = hname.replace("Right", "");
             var hash = hashstring(hname);
-            //var material = new THREE.MeshLambertMaterial({color: new THREE.Color(hash)}); 
-            //var material = new THREE.MeshLambertMaterial({color: new THREE.Color(0x6666ff)}); 
-            //var material = new THREE.MeshBasicMaterial({color: new THREE.Color(hash)});
             var material = new THREE.MeshPhongMaterial({color: new THREE.Color(hash)});
             var mesh = new THREE.Mesh(geometry, material);
             mesh.rotation.x += Math.PI / 2;
-
             mesh.position.x -= 100; //rigith/left
             mesh.position.y += 100; //s/i
             mesh.position.z -= 100; //a/p
             this.meshes.push({name, mesh});
-            
-            //scene.add(mesh);
             this.scene.add(mesh);
-
         },
 
-        toggle_rotate: function() {
+        toggle_rotate() {
             this.controls.autoRotate = !this.controls.autoRotate;
         },
     },
