@@ -22,33 +22,20 @@ Take a look at this [demo](https://brainlife.io/ui/surfaces/)
 ### References 
 TBA
 
-## Running the App 
+## Prerequiste
 
-### On Brainlife.io
+```
+sudo apt install nodejs
+sudo npm install -g lite-server
+```
 
-UPDATE.
+## Installation
 
-### Running Locally (on your machine)
+```
+git clone https://github.com/brain-life/ui-3dsurfaces.git
+cd ui-3dsurfaces
+npm install
+npm run dev
+```
 
-UPDATE
-
-### Sample Datasets
-
-UPDATE
-
-## Output
-
-UPDATE.
-
-#### Product.json
-
-Not relevant for this App as it does not geenrate processed data. 
-
-### Dependencies
-
-This App only requires [singularity](https://www.sylabs.io/singularity/) to run. If you don't have singularity, you will need to install following dependencies.  
-
-  - UPDATE: https://github.com/address
-  
-
-
+Your browser should open a ui-3dsurfaces viewer with data from ./testdata directory. Please see `index.html` to find out how to set paths for input data. and `testdata` for how to format the input data.
