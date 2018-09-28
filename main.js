@@ -136,6 +136,13 @@ new Vue({
         //start loading surfaces geometries
         this.toload = config.surfaces.length;
         config.surfaces.forEach(surface=>{
+            if(surface.filename) surface.path = surface.filename;
+            if(!surface.path) {
+                console.log("empty path");
+                console.dir(surface);
+                this.toload--;
+                return;
+            }
             loader.load(surface.path, geometry=>{
                 this.toload--;
                 this.add_surface(surface.name, geometry);
