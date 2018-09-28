@@ -135,7 +135,7 @@ new Vue({
         
         //start loading surfaces geometries
         this.toload = config.surfaces.length;
-        config.surfaces.forEach(surface=>{
+        async.eachLimit(config.surfaces, 3, (surface, next_surface) => {
             if(!surface.path) {
                 console.error("path not set on surface object");
                 console.dir(surface);
@@ -145,6 +145,7 @@ new Vue({
             loader.load(surface.path, geometry=>{
                 this.toload--;
                 this.add_surface(surface.name, geometry);
+                next_surface();
             });
         });
     },

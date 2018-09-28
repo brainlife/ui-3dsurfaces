@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/brain-life/ui-3dsurfaces#readme",
   "dependencies": {
+    "async": "^2.6.1",
     "panning-orbit-controls": "^1.0.0",
     "three": "^0.96.0",
     "vue": "^2.5.16",
