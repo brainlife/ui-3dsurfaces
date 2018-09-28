@@ -135,17 +135,18 @@ new Vue({
         
         //start loading surfaces geometries
         this.toload = config.surfaces.length;
-        config.surfaces.forEach(surface=>{
+        async.eachLimit(config.surfaces, 3, (surface, next_surface) => {
             if(surface.filename) surface.path = surface.filename;
             if(!surface.path) {
-                console.log("empty path");
+                console.error("path not set on surface object");
                 console.dir(surface);
                 this.toload--;
-                return;
+                return next_surface();
             }
             loader.load(surface.path, geometry=>{
                 this.toload--;
                 this.add_surface(surface.name, geometry);
+                next_surface();
             });
         });
     },
