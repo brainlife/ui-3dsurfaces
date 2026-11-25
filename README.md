@@ -45,6 +45,38 @@ Takes a configured list of VTK file URLs. Author: Soichi Hayashi.
 
 [ui-niivue](https://github.com/brainlife/ui-niivue) (current in-browser viewer) · [abcd-novnc](https://github.com/brainlife/abcd-novnc) (desktop viewer launcher) · [warehouse-next](https://github.com/brainlife/warehouse-next) (datatypes and their viewers)
 
+<details>
+<summary><b>📜 Previous README (technical details)</b></summary>
+
+# ui-3dsurfaces 
+
+This app takes a configured list of URLs for VTK files and renders it using WebGL. This app is used by Brainlife to show `neuro/3dsurfaces` datasets.
+![screenshot](screenshot.png)
+Take a look at this [demo](https://brainlife.io/ui/surfaces/)
+
+### References 
+TBA
+
+## Prerequisite
+
+```
+sudo apt install nodejs
+sudo npm install -g lite-server
+```
+
+## Installation
+
+```
+git clone https://github.com/brain-life/ui-3dsurfaces.git
+cd ui-3dsurfaces
+npm install
+npm run dev
+```
+
+Your browser should open a ui-3dsurfaces viewer with data from ./testdata directory. Please see `index.html` to find out how to set paths for input data. and `testdata` for how to format the input data.
+
+</details>
+
 ## 📚 Citing
 
 If you use brainlife.io in your work, please cite:
